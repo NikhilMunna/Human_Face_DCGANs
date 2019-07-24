@@ -83,3 +83,15 @@ def montage(images):
                 m[1 + i + i * img_h:1 + i + (i + 1) * img_h,
                   1 + j + j * img_w:1 + j + (j + 1) * img_w] = this_img
     return m
+
+
+
+tf.reset_default_graph()
+batch_size = 64
+n_noise = 64
+
+X_in = tf.placeholder(dtype=tf.float32, shape=[None, 40, 40, 3], name='X')
+noise = tf.placeholder(dtype=tf.float32, shape=[None, n_noise])
+
+keep_prob = tf.placeholder(dtype=tf.float32, name='keep_prob')
+is_training = tf.placeholder(dtype=tf.bool, name='is_training')
