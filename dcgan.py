@@ -232,4 +232,5 @@ for i in range(60000):
         #m = imgs[0]
         plt.axis('off')
         plt.imshow(m, cmap='gray')
-        plt.show()
+        plt.savefig("Results/%s.png"%i)
+            # plt.show()
