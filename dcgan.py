@@ -95,3 +95,13 @@ noise = tf.placeholder(dtype=tf.float32, shape=[None, n_noise])
 
 keep_prob = tf.placeholder(dtype=tf.float32, name='keep_prob')
 is_training = tf.placeholder(dtype=tf.bool, name='is_training')
+
+
+
+
+def lrelu(x):
+    return tf.maximum(x, tf.multiply(x, 0.2))
+
+def binary_cross_entropy(x, z):
+    eps = 1e-12
+    return (-(x * tf.log(z + eps) + (1. - x) * tf.log(1. - z + eps)))
