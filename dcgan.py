@@ -105,3 +105,21 @@ def lrelu(x):
 def binary_cross_entropy(x, z):
     eps = 1e-12
     return (-(x * tf.log(z + eps) + (1. - x) * tf.log(1. - z + eps)))
+
+
+
+
+def discriminator(img_in, reuse=None, keep_prob=keep_prob):
+    activation = lrelu
+    with tf.variable_scope("discriminator", reuse=reuse):
+        x = tf.reshape(img_in, shape=[-1, 40, 40, 3])
+        x = tf.layers.conv2d(x, kernel_size=5, filters=256, strides=2, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.layers.conv2d(x, kernel_size=5, filters=128, strides=1, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.layers.conv2d(x, kernel_size=5, filters=64, strides=1, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.contrib.layers.flatten(x)
+        x = tf.layers.dense(x, units=128, activation=activation)
+        x = tf.layers.dense(x, units=1, activation=tf.nn.sigmoid)
+        return x
