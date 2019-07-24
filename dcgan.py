@@ -182,3 +182,54 @@ with tf.control_dependencies(update_ops):
     optimizer_g = tf.train.RMSPropOptimizer(learning_rate=0.0002).minimize(loss_g + g_reg, var_list=vars_g)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
+
+
+
+
+
+for i in range(60000):
+    train_d = True
+    train_g = True
+    keep_prob_train = 0.6 # 0.5
+    
+    
+    n = np.random.uniform(0.0, 1.0, [batch_size, n_noise]).astype(np.float32)   
+    batch = [b for b in next_batch(num=batch_size)]  
+    
+    d_real_ls, d_fake_ls, g_ls, d_ls = sess.run([loss_d_real, loss_d_fake, loss_g, loss_d], feed_dict={X_in: batch, noise: n, keep_prob: keep_prob_train, is_training:True})
+    
+    d_fake_ls_init = d_fake_ls
+    
+    d_real_ls = np.mean(d_real_ls)
+    d_fake_ls = np.mean(d_fake_ls)
+    g_ls = g_ls
+    d_ls = d_ls
+        
+    if g_ls * 1.35 < d_ls:
+        train_g = False
+        pass
+    if d_ls * 1.35 < g_ls:
+        train_d = False
+        pass
+    
+    if train_d:
+        sess.run(optimizer_d, feed_dict={noise: n, X_in: batch, keep_prob: keep_prob_train, is_training:True})
+        
+        
+    if train_g:
+        sess.run(optimizer_g, feed_dict={noise: n, keep_prob: keep_prob_train, is_training:True})
+        
+        
+    if not i % 10:
+        print (i, d_ls, g_ls)
+        if not train_g:
+            print("not training generator")
+        if not train_d:
+            print("not training discriminator")
+        gen_imgs = sess.run(g, feed_dict = {noise: n, keep_prob: 1.0, is_training:False})
+        imgs = [img[:,:,:] for img in gen_imgs]
+        m = montage(imgs)
+        #m = imgs[0]
+        plt.axis('off')
+        plt.imshow(m, cmap='gray')
+        plt.show()
