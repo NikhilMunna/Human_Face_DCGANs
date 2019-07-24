@@ -123,3 +123,35 @@ def discriminator(img_in, reuse=None, keep_prob=keep_prob):
         x = tf.layers.dense(x, units=128, activation=activation)
         x = tf.layers.dense(x, units=1, activation=tf.nn.sigmoid)
         return x
+
+
+   
+def generator(z, keep_prob=keep_prob, is_training=is_training):
+    activation = lrelu
+    momentum = 0.9
+    with tf.variable_scope("generator", reuse=None):
+        x = z
+        
+        d1 = 4#3
+        d2 = 3
+        
+        x = tf.layers.dense(x, units=d1 * d1 * d2, activation=activation)
+        x = tf.layers.dropout(x, keep_prob)      
+        x = tf.contrib.layers.batch_norm(x, is_training=is_training, decay=momentum)  
+        
+        x = tf.reshape(x, shape=[-1, d1, d1, d2])
+        x = tf.image.resize_images(x, size=[10, 10])
+        
+        
+        
+        x = tf.layers.conv2d_transpose(x, kernel_size=5, filters=256, strides=2, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.contrib.layers.batch_norm(x, is_training=is_training, decay=momentum)
+        x = tf.layers.conv2d_transpose(x, kernel_size=5, filters=128, strides=2, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.contrib.layers.batch_norm(x, is_training=is_training, decay=momentum)
+        x = tf.layers.conv2d_transpose(x, kernel_size=5, filters=64, strides=1, padding='same', activation=activation)
+        x = tf.layers.dropout(x, keep_prob)
+        x = tf.contrib.layers.batch_norm(x, is_training=is_training, decay=momentum)
+        x = tf.layers.conv2d_transpose(x, kernel_size=5, filters=3, strides=1, padding='same', activation=tf.nn.sigmoid)
+        return x
