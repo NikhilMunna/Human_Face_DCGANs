@@ -39,3 +39,13 @@ for dir_, _, files in os.walk(new_dir):
         relDir = os.path.relpath(dir_, directory)
         relFile = os.path.join(relDir, fileName)
         filepaths_new.append(directory + "/" + relFile)
+
+def next_batch(num=64, data=filepaths_new):
+    idx = np.arange(0 , len(data))
+    np.random.shuffle(idx)
+    idx = idx[:num]
+    data_shuffle = [imread(data[i]) for i in idx]
+
+    shuffled = np.asarray(data_shuffle)
+    
+    return np.asarray(data_shuffle)
