@@ -155,3 +155,30 @@ def generator(z, keep_prob=keep_prob, is_training=is_training):
         x = tf.contrib.layers.batch_norm(x, is_training=is_training, decay=momentum)
         x = tf.layers.conv2d_transpose(x, kernel_size=5, filters=3, strides=1, padding='same', activation=tf.nn.sigmoid)
         return x
+
+
+
+g = generator(noise, keep_prob, is_training)
+print(g)
+d_real = discriminator(X_in)
+d_fake = discriminator(g, reuse=True)
+
+vars_g = [var for var in tf.trainable_variables() if var.name.startswith("generator")]
+vars_d = [var for var in tf.trainable_variables() if var.name.startswith("discriminator")]
+
+
+d_reg = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(1e-6), vars_d)
+g_reg = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(1e-6), vars_g)
+
+loss_d_real = binary_cross_entropy(tf.ones_like(d_real), d_real)
+loss_d_fake = binary_cross_entropy(tf.zeros_like(d_fake), d_fake)
+loss_g = tf.reduce_mean(binary_cross_entropy(tf.ones_like(d_fake), d_fake))
+
+loss_d = tf.reduce_mean(0.5 * (loss_d_real + loss_d_fake))
+
+update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+with tf.control_dependencies(update_ops):
+    optimizer_d = tf.train.RMSPropOptimizer(learning_rate=0.0001).minimize(loss_d + d_reg, var_list=vars_d)
+    optimizer_g = tf.train.RMSPropOptimizer(learning_rate=0.0002).minimize(loss_g + g_reg, var_list=vars_g)
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
