@@ -30,3 +30,12 @@ for i, fp in enumerate(filepaths):
     img = imread(fp) #/ 255.0
     img = imresize(img, (40, 40))
     imsave(new_dir + "/" + str(i) + ".png", img)
+
+filepaths_new = []
+for dir_, _, files in os.walk(new_dir):
+    for fileName in files:
+        if not fileName.endswith(".png"):
+            continue
+        relDir = os.path.relpath(dir_, directory)
+        relFile = os.path.join(relDir, fileName)
+        filepaths_new.append(directory + "/" + relFile)
