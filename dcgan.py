@@ -5,11 +5,13 @@ new_dir = "new_imgs"
 import urllib.request
 import tarfile
 import os
+import imageio
+import image
 import tarfile
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
-import PIL
+from PIL import *
 # from scipy.misc import imresize, imsave
 import tensorflow as tf
 
@@ -29,7 +31,7 @@ for dir_, _, files in os.walk(directory):
         
 for i, fp in enumerate(filepaths):
     img = imread(fp) #/ 255.0
-    img =numpy.array(Image.fromarray(arr).resize(img, (40, 40)))
+    img =np.array(Image.fromarray(img).resize([40,40]))
     imageio.imwrite(new_dir + "/" + str(i) + ".png", img)
 
 filepaths_new = []
@@ -221,7 +223,7 @@ for i in range(60000):
         sess.run(optimizer_g, feed_dict={noise: n, keep_prob: keep_prob_train, is_training:True})
         
         
-    if not i % 10:
+    if not i % 100:
         print (i, d_ls, g_ls)
         if not train_g:
             print("not training generator")
